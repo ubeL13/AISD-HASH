@@ -53,6 +53,22 @@ public:
             }
         }
     }
+    UnorderedMap(size_t size, size_t numElements, K keyMin, K keyMax, V valueMin, V valueMax) : tableSize(size) {
+        table = new Node<K, V>* [tableSize];
+        for (size_t i = 0; i < tableSize; ++i) {
+            table[i] = nullptr;
+        }
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<K> distribKey(keyMin, keyMax);
+        std::uniform_int_distribution<V> distribValue(valueMin, valueMax);
+
+        for (size_t i = 0; i < numElements; ++i) {
+            K randomKey = distribKey(gen);
+            V randomValue = distribValue(gen);
+            insert(randomKey, randomValue);
+        }
+    }
 
     ~UnorderedMap() {
         for (size_t i = 0; i < tableSize; ++i) {
