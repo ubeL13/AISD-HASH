@@ -112,5 +112,66 @@ public:
         insert(key, value);
     }
 
+    bool contains(V value) {
+        for (size_t i = 0; i < tableSize; ++i) {
+            Node<K, V>* current = table[i];
+            while (current != nullptr) {
+                if (current->value == value) {
+                    return true;
+                }
+                current = current->next;
+            }
+        }
+        return false;
+    }
+
+    V* search(K key) {
+        size_t idx = hashFunction(key);
+        Node<K, V>* current = table[idx];
+        while (current) {
+            if (current->key == key) {
+                return &(current->value);
+            }
+            current = current->next;
+        }
+        return nullptr;
+    }
+
+    bool erase(K key) {
+        size_t idx = hashFunction(key);
+        Node<K, V>* current = table[idx];
+        Node<K, V>* prev = nullptr;
+        while (current) {
+            if (current->key == key) {
+                if (prev) {
+                    prev->next = current->next;
+                }
+                else {
+                    table[idx] = current->next;
+                }
+                delete current;
+                return true;
+            }
+            prev = current;
+            current = current->next;
+        }
+        return false;
+    }
+
+
+    int count(K key) {
+        size_t idx = hashFunction(key);
+        Node<K, V>* current = table[idx];
+        int count = 0;
+        while (current) {
+            if (current->key == key) {
+                count++;
+            }
+            current = current->next;
+        }
+        return count;
+    }
+
 
 };
+
