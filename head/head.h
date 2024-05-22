@@ -72,6 +72,20 @@ public:
     }
 
     ~UnorderedMap() {
+        clear();
+    }
+
+    UnorderedMap<K, V>& operator=(UnorderedMap<K, V> other) {
+        clear();
+        table = other.table;
+        tableSize = other.tableSize;
+        other.table = nullptr;
+        other.tableSize = 0;
+
+        return *this;
+    }
+
+    void clear() {
         for (size_t i = 0; i < tableSize; ++i) {
             Node<K, V>* current = table[i];
             while (current != nullptr) {
@@ -83,23 +97,6 @@ public:
         delete[] table;
     }
 
-    UnorderedMap<K, V>& operator=(UnorderedMap<K, V> other) {
-        for (size_t i = 0; i < tableSize; ++i) {
-            while (table[i] != nullptr) {
-                Node<K, V>* toDelete = table[i];
-                table[i] = table[i]->next;
-                delete toDelete;
-            }
-        }
-        delete[] table;
-        table = other.table;
-        tableSize = other.tableSize;
-        other.table = nullptr;
-        other.tableSize = 0;
-
-        return *this;
-    }
-
     void print() {
         for (size_t i = 0; i < tableSize; ++i) {
             Node<K, V>* current = table[i];
@@ -109,12 +106,23 @@ public:
             }
         }
     }
-    //исправить
+  
     void insert(K key, V value) {
+        if (search(key) != nullptr) {
+            return;
+        }
         size_t idx = hashFunction(key);
         Node<K, V>* node = new Node<K, V>(key, value);
-        node->next = table[idx];
-        table[idx] = node;
+        if (table[idx] == nullptr) {
+            table[idx] = node;
+        }
+        else {
+            Node<K, V>* current = table[idx];
+            while (current->next != nullptr) {
+                current = current->next;
+            }
+            current->next = node;
+        }
     }
 
     void insert_or_assign(K key, V value) {
