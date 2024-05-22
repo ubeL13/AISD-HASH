@@ -77,6 +77,14 @@ int main() {
 
     cout << "Содержимое хэш-таблицы после удаления:" << endl;
     hashMap.print();
-    
+    cout << "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" << endl;
+    std::vector<int> vec = generateRandomVector();
+    for (int i = 0; i < size(vec); i++) {
+        cout << vec[i] << endl;
+    }
+    UnorderedMap<int, int> table = count_numbers(vec);
+    print_numbers_count(table);
+    return 0;
+
 }
 

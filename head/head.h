@@ -16,7 +16,7 @@ struct Node {
     Node(K k, V v) : key(k), value(v), next(nullptr) {}
 };
 
-template<typename K, typename V>    
+template<typename K, typename V>
 class UnorderedMap {
 private:
     Node<K, V>** table;
@@ -53,6 +53,7 @@ public:
             }
         }
     }
+
     UnorderedMap(size_t size, size_t numElements, K keyMin, K keyMax, V valueMin, V valueMax) : tableSize(size) {
         table = new Node<K, V>* [tableSize];
         for (size_t i = 0; i < tableSize; ++i) {
@@ -98,6 +99,7 @@ public:
 
         return *this;
     }
+
     void print() {
         for (size_t i = 0; i < tableSize; ++i) {
             Node<K, V>* current = table[i];
@@ -107,7 +109,7 @@ public:
             }
         }
     }
-
+    //исправить
     void insert(K key, V value) {
         size_t idx = hashFunction(key);
         Node<K, V>* node = new Node<K, V>(key, value);
@@ -188,6 +190,41 @@ public:
         return count;
     }
 
-
 };
 
+std::vector<int> generateRandomVector() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> distrib(1, 100);
+
+    std::vector<int> vec(100);
+
+    for (auto& i : vec) {
+        int randomValue = distrib(gen);
+        i = randomValue;
+    }
+    return vec;
+}
+
+UnorderedMap<int, int> count_numbers(const std::vector<int>& vec) {
+    UnorderedMap<int, int> map(vec.size());
+    for (auto& i : vec) {
+        int* count = map.search(i);
+        if (count == nullptr) {
+            map.insert(i, 1);
+        }
+        else {
+            (*count)++;
+        }
+    }
+    return map;
+}
+
+void print_numbers_count(UnorderedMap<int, int>& table) {
+    for (int i = 1; i <= 100; i++) {
+        int* count_ptr = table.search(i);
+        if (count_ptr != nullptr) {
+            std::cout << "Number " << i << " counts " << *count_ptr << " times" << std::endl;
+        }
+    }
+}
