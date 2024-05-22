@@ -1,4 +1,11 @@
-#include <cstdlib> 
+#include <iostream>
+#include <random>
+#include <cstdlib>
+#include<array>
+#include <cstdint>
+
+
+
 
 template<typename K, typename V>
 struct Node {
@@ -6,10 +13,10 @@ struct Node {
     V value;
     Node* next;
 
-    Node(K k, V v) : key(k), value(v), next(NULL) {}
+    Node(K k, V v) : key(k), value(v), next(nullptr) {}
 };
 
-template<typename K, typename V>
+template<typename K, typename V>    
 class UnorderedMap {
 private:
     Node<K, V>** table;
@@ -23,24 +30,22 @@ public:
     UnorderedMap(size_t size) : tableSize(size) {
         table = new Node<K, V>* [tableSize];
         for (size_t i = 0; i < tableSize; ++i) {
-            table[i] = NULL;
+            table[i] = nullptr;
         }
     }
-
-
 
     UnorderedMap(const UnorderedMap<K, V>& other) : tableSize(other.tableSize) {
         table = new Node<K, V>* [tableSize];
         for (size_t i = 0; i < tableSize; ++i) {
-            if (other.table[i] == NULL) {
-                table[i] = NULL;
+            if (other.table[i] == nullptr) {
+                table[i] = nullptr;
             }
             else {
                 Node<K, V>* current = other.table[i];
                 Node<K, V>* newChain = new Node<K, V>(current->key, current->value);
                 table[i] = newChain;
 
-                while (current->next != NULL) {
+                while (current->next != nullptr) {
                     current = current->next;
                     newChain->next = new Node<K, V>(current->key, current->value);
                     newChain = newChain->next;
@@ -52,7 +57,7 @@ public:
     ~UnorderedMap() {
         for (size_t i = 0; i < tableSize; ++i) {
             Node<K, V>* current = table[i];
-            while (current != NULL) {
+            while (current != nullptr) {
                 Node<K, V>* toDelete = current;
                 current = current->next;
                 delete toDelete;
@@ -61,36 +66,51 @@ public:
         delete[] table;
     }
 
-    UnorderedMap<K, V>& operator=(const UnorderedMap<K, V>& other) {
-        if (this != &other) {
-            for (size_t i = 0; i < tableSize; ++i) {
-                Node<K, V>* current = table[i];
-                while (current != NULL) {
-                    Node<K, V>* toDelete = current;
-                    current = current->next;
-                    delete toDelete;
-                }
-            }
-            delete[] table;
-            tableSize = other.tableSize;
-            table = new Node<K, V>* [tableSize];
-            for (size_t i = 0; i < tableSize; ++i) {
-                if (other.table[i] == NULL) {
-                    table[i] = NULL;
-                }
-                else {
-                    Node<K, V>* current = other.table[i];
-                    Node<K, V>* newChain = new Node<K, V>(current->key, current->value);
-                    table[i] = newChain;
-
-                    while (current->next != NULL) {
-                        current = current->next;
-                        newChain->next = new Node<K, V>(current->key, current->value);
-                        newChain = newChain->next;
-                    }
-                }
+    UnorderedMap<K, V>& operator=(UnorderedMap<K, V> other) {
+        for (size_t i = 0; i < tableSize; ++i) {
+            while (table[i] != nullptr) {
+                Node<K, V>* toDelete = table[i];
+                table[i] = table[i]->next;
+                delete toDelete;
             }
         }
+        delete[] table;
+        table = other.table;
+        tableSize = other.tableSize;
+        other.table = nullptr;
+        other.tableSize = 0;
+
         return *this;
     }
+    void print() {
+        for (size_t i = 0; i < tableSize; ++i) {
+            Node<K, V>* current = table[i];
+            while (current != nullptr) {
+                std::cout << "{" << current->key << ", " << current->value << "}, " << std::endl;
+                current = current->next;
+            }
+        }
+    }
+
+    void insert(K key, V value) {
+        size_t idx = hashFunction(key);
+        Node<K, V>* node = new Node<K, V>(key, value);
+        node->next = table[idx];
+        table[idx] = node;
+    }
+
+    void insert_or_assign(K key, V value) {
+        size_t idx = hashFunction(key);
+        Node<K, V>* current = table[idx];
+        while (current) {
+            if (current->key == key) {
+                current->value = value;
+                return;
+            }
+            current = current->next;
+        }
+        insert(key, value);
+    }
+
+
 };
